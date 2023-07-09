@@ -10,4 +10,6 @@ public interface AllenamentoRepository extends MongoRepository<Allenamento, Stri
     Optional<Allenamento> findByNome(String nome);
 
     List<Allenamento> findAllByTipologia(String tipologia);
+
+    boolean existsByNomeAndTipologia(String nome, String tipologia);
 }
