@@ -44,14 +44,102 @@ public class AllenamentoRestController {
 
                 // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
                 if (roleResponse.getRole().equals("AMMINISTRATORE")) {
-                    Allenamento allenamento = new Allenamento();
 
-                    allenamento.setNome(allenamentoDTO.getNome());
-                    allenamento.setTipologia(allenamentoDTO.getTipologia());
+                    if (!verificaEsistenzaAllenamento(request, allenamentoDTO)){
 
-                    allenamentoRepository.save(allenamento);
+                        Allenamento allenamento = new Allenamento();
 
-                    allenamentoDTO.setId(allenamento.getId());
+                        allenamento.setNome(allenamentoDTO.getNome());
+                        allenamento.setTipologia(allenamentoDTO.getTipologia());
+
+                        allenamentoRepository.save(allenamento);
+
+                        allenamentoDTO.setId(allenamento.getId());
+
+                        return allenamentoDTO;
+                    }else{
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Allenamento già esistente");
+                    }
+                }else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+    }
+
+
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    public List<AllenamentoDTO> trovaTutti(HttpServletRequest request){
+
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
+
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
+
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("AMMINISTRATORE") || roleResponse.getRole().equals("COACH")) {
+
+                    List<AllenamentoDTO> allenamenti = new ArrayList<>();
+
+                    for (Allenamento allenamento : allenamentoRepository.findAll()){
+
+                        AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
+
+                        allenamentoDTO.setId(allenamento.getId());
+                        allenamentoDTO.setNome(allenamento.getNome());
+                        allenamentoDTO.setTipologia(allenamento.getTipologia());
+
+                        allenamenti.add(allenamentoDTO);
+                    }
+
+                    return allenamenti;
+                }else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+    }
+
+
+    @RequestMapping(value = "/findById/{idAllenamento}", method = RequestMethod.GET)
+    public AllenamentoDTO trovaPerId(HttpServletRequest request, @PathVariable String idAllenamento){
+
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
+
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
+
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("AMMINISTRATORE") || roleResponse.getRole().equals("COACH") || roleResponse.getRole().equals("ATLETA")) {
+
+                    AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
+                    Optional<Allenamento> optAllenamento = allenamentoRepository.findById(idAllenamento);
+
+                    if (optAllenamento.isPresent()){
+                        Allenamento allenamento = optAllenamento.get();
+
+                        allenamentoDTO.setId(allenamento.getId());
+                        allenamentoDTO.setNome(allenamento.getNome());
+                        allenamentoDTO.setTipologia(allenamento.getTipologia());
+                    }
 
                     return allenamentoDTO;
                 }else {
@@ -65,118 +153,205 @@ public class AllenamentoRestController {
     }
 
 
-    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
-    public List<AllenamentoDTO> trovaTutti(){
-
-        List<AllenamentoDTO> allenamenti = new ArrayList<>();
-
-        for (Allenamento allenamento : allenamentoRepository.findAll()){
-
-            AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
-            allenamentoDTO.setId(allenamento.getId());
-            allenamentoDTO.setNome(allenamentoDTO.getNome());
-            allenamentoDTO.setTipologia(allenamento.getTipologia());
-
-            allenamenti.add(allenamentoDTO);
-        }
-
-        return allenamenti;
-    }
-
-    @RequestMapping(value = "/findById/{idAllenamento}", method = RequestMethod.GET)
-    public AllenamentoDTO trovaPerId(@PathVariable String idAllenamento){
-
-        AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
-        Optional<Allenamento> optAllenamento = allenamentoRepository.findById(idAllenamento);
-
-        if (optAllenamento.isPresent()){
-            Allenamento allenamento = optAllenamento.get();
-
-            allenamentoDTO.setId(allenamento.getId());
-            allenamentoDTO.setNome(allenamento.getNome());
-            allenamentoDTO.setTipologia(allenamento.getTipologia());
-        }
-
-        return allenamentoDTO;
-    }
-
     @RequestMapping(value = "/findByName/{nome}", method = RequestMethod.GET)
-    public AllenamentoDTO trovaPerNome(@PathVariable String nome){
+    public AllenamentoDTO trovaPerNome(HttpServletRequest request, @PathVariable String nome){
+        String authorizationHeader = request.getHeader("Authorization");
 
-        AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
-        Optional<Allenamento> optAllenamento = allenamentoRepository.findByNome(nome);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
 
-        if (optAllenamento.isPresent()){
-            Allenamento allenamento = optAllenamento.get();
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
 
-            allenamentoDTO.setId(allenamento.getId());
-            allenamentoDTO.setNome(allenamento.getNome());
-            allenamentoDTO.setTipologia(allenamento.getTipologia());
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("AMMINISTRATORE") || roleResponse.getRole().equals("COACH")) {
+
+                    AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
+                    Optional<Allenamento> optAllenamento = allenamentoRepository.findByNome(nome);
+
+                    if (optAllenamento.isPresent()){
+                        Allenamento allenamento = optAllenamento.get();
+
+                        allenamentoDTO.setId(allenamento.getId());
+                        allenamentoDTO.setNome(allenamento.getNome());
+                        allenamentoDTO.setTipologia(allenamento.getTipologia());
+                    }
+
+                    return allenamentoDTO;
+                }else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
         }
-
-        return allenamentoDTO;
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
     }
 
 
     @RequestMapping(value = "/findAllByType/{tipologia}", method = RequestMethod.GET)
-    public List<AllenamentoDTO> trovaPerTipologia(@PathVariable String tipologia){
+    public List<AllenamentoDTO> trovaPerTipologia(HttpServletRequest request, @PathVariable String tipologia){
 
-        List<AllenamentoDTO> allenamenti = new ArrayList<>();
+        String authorizationHeader = request.getHeader("Authorization");
 
-        for (Allenamento allenamento : allenamentoRepository.findAllByTipologia(tipologia)){
-            AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
 
-            allenamentoDTO.setId(allenamento.getId());
-            allenamentoDTO.setNome(allenamento.getNome());
-            allenamentoDTO.setTipologia(allenamento.getTipologia());
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
 
-            allenamenti.add(allenamentoDTO);
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("AMMINISTRATORE") || (roleResponse.getRole().equals("COACH"))) {
+
+                    List<AllenamentoDTO> allenamenti = new ArrayList<>();
+
+                    for (Allenamento allenamento : allenamentoRepository.findAllByTipologia(tipologia)){
+                        AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
+
+                        allenamentoDTO.setId(allenamento.getId());
+                        allenamentoDTO.setNome(allenamento.getNome());
+                        allenamentoDTO.setTipologia(allenamento.getTipologia());
+
+                        allenamenti.add(allenamentoDTO);
+                    }
+
+                    return allenamenti;
+                }else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
         }
-
-        return allenamenti;
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
     }
 
 
     @PatchMapping(value = "/changeTrainName/{nome}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public AllenamentoDTO cambiaNomeAllenamento(@PathVariable String nome, @RequestBody String newName){
+    public AllenamentoDTO cambiaNomeAllenamento(HttpServletRequest request, @PathVariable String nome, @RequestBody AllenamentoDTO allenamentoDTO){
 
-        AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
-        Optional<Allenamento> optionalAllenamento = allenamentoRepository.findByNome(nome);
+        String authorizationHeader = request.getHeader("Authorization");
 
-        if (optionalAllenamento.isPresent()){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
 
-            Allenamento allenamento = optionalAllenamento.get();
-            allenamento.setNome(newName);
-            allenamentoRepository.save(allenamento);
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
 
-            allenamentoDTO.setId(allenamento.getId());
-            allenamentoDTO.setNome(allenamento.getNome());
-            allenamentoDTO.setTipologia(allenamento.getTipologia());
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("AMMINISTRATORE")) {
+
+                    Optional<Allenamento> optionalAllenamento = allenamentoRepository.findByNome(nome);
+
+                    if (optionalAllenamento.isPresent()){
+
+                        Allenamento allenamento = optionalAllenamento.get();
+                        allenamento.setNome(allenamentoDTO.getNome());
+                        allenamentoRepository.save(allenamento);
+
+                        allenamentoDTO.setId(allenamento.getId());
+                        allenamentoDTO.setNome(allenamento.getNome());
+                        allenamentoDTO.setTipologia(allenamento.getTipologia());
+                    }
+
+                    return allenamentoDTO;
+                }else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
         }
-
-        return allenamentoDTO;
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
     }
 
 
     @PatchMapping(value = "/changeTypeByName/{nome}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public AllenamentoDTO cambiaTipologiaAllenamento(@PathVariable String nome, @RequestBody String tipologia){
+    public AllenamentoDTO cambiaTipologiaAllenamento(HttpServletRequest request, @PathVariable String nome, @RequestBody AllenamentoDTO allenamentoDTO){
 
-        AllenamentoDTO allenamentoDTO = new AllenamentoDTO();
-        Optional<Allenamento> optionalAllenamento = allenamentoRepository.findByNome(nome);
+        String authorizationHeader = request.getHeader("Authorization");
 
-        if (optionalAllenamento.isPresent()){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
 
-            Allenamento allenamento = optionalAllenamento.get();
-            allenamento.setTipologia(tipologia);
-            allenamentoRepository.save(allenamento);
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
 
-            allenamentoDTO.setId(allenamento.getId());
-            allenamentoDTO.setNome(allenamento.getNome());
-            allenamentoDTO.setTipologia(allenamento.getTipologia());
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("AMMINISTRATORE")) {
+
+                    Optional<Allenamento> optionalAllenamento = allenamentoRepository.findByNome(nome);
+
+                    if (optionalAllenamento.isPresent()){
+
+                        Allenamento allenamento = optionalAllenamento.get();
+                        allenamento.setTipologia(allenamentoDTO.getTipologia());
+                        allenamentoRepository.save(allenamento);
+
+                        allenamentoDTO.setId(allenamento.getId());
+                        allenamentoDTO.setNome(allenamento.getNome());
+                        allenamentoDTO.setTipologia(allenamento.getTipologia());
+                    }
+
+                    return allenamentoDTO;
+                }else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
         }
-
-        return allenamentoDTO;
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
     }
+
+
+    @RequestMapping(value = "/checkIfTrainAlreadyExists", method = RequestMethod.GET)
+    public boolean verificaEsistenzaAllenamento(HttpServletRequest request, @RequestBody AllenamentoDTO allenamentoDTO){
+
+        String authorizationHeader = request.getHeader("Authorization");
+        boolean esiste = false;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
+
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
+
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("AMMINISTRATORE")) {
+
+                    for (Allenamento allenamento : allenamentoRepository.findAll()){
+                        if ((allenamento.getNome().equals(allenamentoDTO.getNome())) && (allenamento.getTipologia().equals(allenamentoDTO.getTipologia()))){
+                            esiste = true;
+
+                            return esiste;
+                        }
+                    }
+                }else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+    }
+
 
     private RoleResponse getRoleResponse(String jwt) {
         return apiCalls.checkRole(jwt);
