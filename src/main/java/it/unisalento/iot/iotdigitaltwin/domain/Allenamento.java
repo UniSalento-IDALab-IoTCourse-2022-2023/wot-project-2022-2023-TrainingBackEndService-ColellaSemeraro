@@ -12,6 +12,8 @@ public class Allenamento {
 
     String tipologia;
 
+    String intensita;
+
     public String getId() {
         return id;
     }
@@ -34,5 +36,13 @@ public class Allenamento {
 
     public void setTipologia(String tipologia) {
         this.tipologia = tipologia;
+    }
+
+    public String getIntensita() {
+        return intensita;
+    }
+
+    public void setIntensita(String intensita) {
+        this.intensita = intensita;
     }
 }

@@ -50,6 +50,7 @@ public class AllenamentoRestController {
 
                         allenamento.setNome(allenamentoDTO.getNome());
                         allenamento.setTipologia(allenamentoDTO.getTipologia());
+                        allenamento.setIntensita(allenamentoDTO.getIntensita());
 
                         allenamentoRepository.save(allenamento);
 
@@ -95,6 +96,7 @@ public class AllenamentoRestController {
                         allenamentoDTO.setId(allenamento.getId());
                         allenamentoDTO.setNome(allenamento.getNome());
                         allenamentoDTO.setTipologia(allenamento.getTipologia());
+                        allenamentoDTO.setIntensita(allenamento.getIntensita());
 
                         allenamenti.add(allenamentoDTO);
                     }
@@ -136,6 +138,7 @@ public class AllenamentoRestController {
                         allenamentoDTO.setId(allenamento.getId());
                         allenamentoDTO.setNome(allenamento.getNome());
                         allenamentoDTO.setTipologia(allenamento.getTipologia());
+                        allenamentoDTO.setIntensita(allenamento.getIntensita());
                     }
 
                     return allenamentoDTO;
@@ -174,6 +177,7 @@ public class AllenamentoRestController {
                         allenamentoDTO.setId(allenamento.getId());
                         allenamentoDTO.setNome(allenamento.getNome());
                         allenamentoDTO.setTipologia(allenamento.getTipologia());
+                        allenamentoDTO.setIntensita(allenamento.getIntensita());
                     }
 
                     return allenamentoDTO;
@@ -212,6 +216,7 @@ public class AllenamentoRestController {
                         allenamentoDTO.setId(allenamento.getId());
                         allenamentoDTO.setNome(allenamento.getNome());
                         allenamentoDTO.setTipologia(allenamento.getTipologia());
+                        allenamentoDTO.setIntensita(allenamento.getIntensita());
 
                         allenamenti.add(allenamentoDTO);
                     }
@@ -261,6 +266,7 @@ public class AllenamentoRestController {
                             allenamentoDTO.setId(allenamento.getId());
                             allenamentoDTO.setNome(allenamento.getNome());
                             allenamentoDTO.setTipologia(allenamento.getTipologia());
+                            allenamentoDTO.setIntensita(allenamento.getIntensita());
 
                             return allenamentoDTO;
 
@@ -307,6 +313,8 @@ public class AllenamentoRestController {
                         allenamentoDTO.setId(allenamento.getId());
                         allenamentoDTO.setNome(allenamento.getNome());
                         allenamentoDTO.setTipologia(allenamento.getTipologia());
+                        allenamentoDTO.setIntensita(allenamento.getIntensita());
+
                     }
 
                     return allenamentoDTO;
