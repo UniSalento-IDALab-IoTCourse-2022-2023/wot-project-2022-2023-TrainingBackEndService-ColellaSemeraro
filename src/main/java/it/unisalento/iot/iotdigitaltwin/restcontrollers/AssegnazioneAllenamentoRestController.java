@@ -50,6 +50,7 @@ public class AssegnazioneAllenamentoRestController {
                     assegnazioneAllenamento.setNumeroCircuiti(assegnazioneAllenamentoDTO.getNumeroCircuiti());
                     assegnazioneAllenamento.setDataAssegnazione(assegnazioneAllenamentoDTO.getDataAssegnazione());
                     assegnazioneAllenamento.setIdRisultatoPrecedente(assegnazioneAllenamentoDTO.getIdRisultatoPrecedente());
+                    assegnazioneAllenamento.setDurataCircuiti(assegnazioneAllenamentoDTO.getDurataCircuiti());
 
                     assegnazioneAllenamentoRepository.save(assegnazioneAllenamento);
 

@@ -18,6 +18,8 @@ public class AssegnazioneAllenamentoDTO {
 
     int durataInMinuti;
 
+    int durataCircuiti;
+
     String idRisultatoPrecedente;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -78,5 +80,13 @@ public class AssegnazioneAllenamentoDTO {
 
     public void setIdRisultatoPrecedente(String idRisultatoPrecedente) {
         this.idRisultatoPrecedente = idRisultatoPrecedente;
+    }
+
+    public int getDurataCircuiti() {
+        return durataCircuiti;
+    }
+
+    public void setDurataCircuiti(int durataCircuiti) {
+        this.durataCircuiti = durataCircuiti;
     }
 }
