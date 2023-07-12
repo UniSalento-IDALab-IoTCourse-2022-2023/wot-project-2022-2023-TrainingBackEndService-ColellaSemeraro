@@ -19,19 +19,11 @@ public class AssegnazioneAllenamento {
 
     String idAtleta;
 
-    int indiceSforzo;
-
     int numeroCircuiti;
 
     int durataInMinuti;
 
-    int calorieConsumate;
-
-    public enum Intensita{
-        Bassa, Media, Elevata
-    }
-
-    Intensita intensita;
+    String idRisultatoPrecedente;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -61,14 +53,6 @@ public class AssegnazioneAllenamento {
         this.idAtleta = idAtleta;
     }
 
-    public int getIndiceSforzo() {
-        return indiceSforzo;
-    }
-
-    public void setIndiceSforzo(int indiceSforzo) {
-        this.indiceSforzo = indiceSforzo;
-    }
-
     public int getNumeroCircuiti() {
         return numeroCircuiti;
     }
@@ -85,14 +69,6 @@ public class AssegnazioneAllenamento {
         this.durataInMinuti = durataInMinuti;
     }
 
-    public int getCalorieConsumate() {
-        return calorieConsumate;
-    }
-
-    public void setCalorieConsumate(int calorieConsumate) {
-        this.calorieConsumate = calorieConsumate;
-    }
-
     public LocalDate getDataAssegnazione() {
         return dataAssegnazione;
     }
@@ -101,11 +77,11 @@ public class AssegnazioneAllenamento {
         this.dataAssegnazione = dataAssegnazione;
     }
 
-    public Intensita getIntensita() {
-        return intensita;
+    public String getIdRisultatoPrecedente() {
+        return idRisultatoPrecedente;
     }
 
-    public void setIntensita(Intensita intensita) {
-        this.intensita = intensita;
+    public void setIdRisultatoPrecedente(String idRisultatoPrecedente) {
+        this.idRisultatoPrecedente = idRisultatoPrecedente;
     }
 }

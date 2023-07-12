@@ -47,11 +47,9 @@ public class AssegnazioneAllenamentoRestController {
                     assegnazioneAllenamento.setIdAllenamento(assegnazioneAllenamentoDTO.getIdAllenamento());
                     assegnazioneAllenamento.setIdAtleta(assegnazioneAllenamentoDTO.getIdAtleta());
                     assegnazioneAllenamento.setDurataInMinuti(assegnazioneAllenamentoDTO.getDurataInMinuti());
-                    assegnazioneAllenamento.setCalorieConsumate(assegnazioneAllenamentoDTO.getCalorieConsumate());
-                    assegnazioneAllenamento.setIndiceSforzo(assegnazioneAllenamentoDTO.getIndiceSforzo());
                     assegnazioneAllenamento.setNumeroCircuiti(assegnazioneAllenamentoDTO.getNumeroCircuiti());
                     assegnazioneAllenamento.setDataAssegnazione(assegnazioneAllenamentoDTO.getDataAssegnazione());
-                    assegnazioneAllenamento.setIntensita(assegnazioneAllenamentoDTO.getIntensita());
+                    assegnazioneAllenamento.setIdRisultatoPrecedente(assegnazioneAllenamentoDTO.getIdRisultatoPrecedente());
 
                     assegnazioneAllenamentoRepository.save(assegnazioneAllenamento);
 
@@ -66,6 +64,36 @@ public class AssegnazioneAllenamentoRestController {
             }
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+    }
+
+    @GetMapping(value = "/existsByIdRisultatoPrecedente/{idRisultatoPrecedente}")
+    public boolean existsByRisultatoPrecedente(HttpServletRequest request, @PathVariable String idRisultatoPrecedente) {
+
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String jwt = authorizationHeader.substring(7);
+            RoleResponse roleResponse = getRoleResponse(jwt);
+            System.out.println(roleResponse);
+
+            // Verifica se l'autenticazione è valida
+            if (roleResponse != null && !Objects.equals(roleResponse.getRole(), "Authentication failed")) {
+                // Esegui le operazioni del metodo solo se l'autenticazione è valida
+
+                // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
+                if (roleResponse.getRole().equals("COACH")) {
+
+                    return assegnazioneAllenamentoRepository.existsByIdRisultatoPrecedente(idRisultatoPrecedente);
+
+                } else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+                }
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Autenticazione fallita");
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accesso negato");
+
     }
 
     private RoleResponse getRoleResponse(String jwt) {

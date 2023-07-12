@@ -16,4 +16,6 @@ public interface AssegnazioneAllenamentoRepository extends MongoRepository<Asseg
     List<AssegnazioneAllenamento> findAllByIdAllenamentoAndIdAtleta(String idAllenamento, String idAtleta);
 
     List<AssegnazioneAllenamento> findAllByIdAtletaAndDataAssegnazione(String idAtleta, LocalDate dataAssegnazione);
+
+    boolean existsByIdRisultatoPrecedente(String idRisultatoPrecedente);
 }
