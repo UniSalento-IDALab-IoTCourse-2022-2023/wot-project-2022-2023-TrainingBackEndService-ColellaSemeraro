@@ -6,16 +6,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface AssegnazioneAllenamentoRepository extends MongoRepository<AssegnazioneAllenamento, String> {
 
-    List<AssegnazioneAllenamento> findAllByIdAllenamento(String idAllenamento);
-
     List<AssegnazioneAllenamento> findAllByIdAtleta(String idAtleta);
 
-    List<AssegnazioneAllenamento> findAllByIdAllenamentoAndIdAtleta(String idAllenamento, String idAtleta);
-
-    List<AssegnazioneAllenamento> findAllByIdAtletaAndDataAssegnazione(String idAtleta, LocalDate dataAssegnazione);
-
     boolean existsByIdRisultatoPrecedente(String idRisultatoPrecedente);
+
+    Optional<AssegnazioneAllenamento> findByIdRisultatoPrecedente(String idRisultatoPrecedente);
 }
