@@ -16,7 +16,7 @@ public class APICalls {
 
     public RoleResponse checkRole(String jwtToken) throws ResponseStatusException {
         try {
-            String url = "http://my-sba-iot-auth:8080/api/users/login";
+            String url = "https://x7oeqezkzi.execute-api.us-east-1.amazonaws.com/dev/api/users/login";
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + jwtToken);
             // You can also set other headers if needed

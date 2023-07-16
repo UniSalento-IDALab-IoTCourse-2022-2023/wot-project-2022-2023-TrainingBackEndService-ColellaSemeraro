@@ -45,7 +45,7 @@ public class AssegnazioneAllenamentoRestController {
                 // Esempio: Controlla se l'utente ha il ruolo necessario per eseguire questa operazione
                 if (roleResponse.getRole().equals("COACH")) {
 
-                    String url = "http://my-sba-iot-auth:8080/api/users/atleta/findIdCoachByIdAtleta/" + assegnazioneAllenamentoDTO.getIdAtleta();
+                    String url = "https://x7oeqezkzi.execute-api.us-east-1.amazonaws.com/dev/api/users/atleta/findIdCoachByIdAtleta/" + assegnazioneAllenamentoDTO.getIdAtleta();
                     RestTemplate restTemplate = new RestTemplate();
 
                     HttpHeaders headers = new HttpHeaders();
